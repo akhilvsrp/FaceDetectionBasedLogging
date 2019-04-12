@@ -1,0 +1,59 @@
+version: '3'
+services:
+  
+  mariadb:
+    container_name: mariadb
+    image: mariadb
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=12345
+    volumes:
+      - $HOME/Akhil/Docker/mariadb:/var/lib/mysql
+  
+  phpmyadmin:
+    container_name: pmadmin
+    image: 'bitnami/phpmyadmin:latest'
+    depends_on:
+      - mariadb
+    ports:
+      - '8080:80'
+      - '65443:443'
+    volumes:
+      - $HOME/Akhil/Docker/phpmyadmin:/bitnami
+
+  camerarecognition:
+    container_name: face_rec
+    build:
+      context: ./Code
+      args:
+        - user=$USER
+        - uid=1000
+    image: facerec:v0.1
+    depends_on:
+      - mariadb
+    environment:
+      - PYTHONUNBUFFERED=0
+    volumes:
+      - $HOME/Akhil/Final /Code:/Code
+    devices:
+      - /dev/video0:/dev/video0
+      
+  updatedb:
+    container_name: dbupdation
+    build:
+      context: ./db
+      args:
+        - user=$USER
+        - uid=1000
+    image: update:v0.1
+    depends_on:
+      - mariadb
+    environment:
+      - PYTHONUNBUFFERED=0
+    volumes:
+      - $HOME/Akhil/Final /db:/db
+
+
+      
+
